@@ -1,0 +1,8 @@
+# this is mysql config
+[list]
+    [list.default]
+        driver_name = "mysql"
+        data_source_name = "root:q1w2e3r4@tcp(152.136.247.137:3406)/go_gateway?charset=utf8&parseTime=true&loc=Asia%2FShanghai"
+        max_open_conn = 20
+        max_idle_conn = 10
+        max_conn_life_time = 100
