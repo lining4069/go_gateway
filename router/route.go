@@ -75,16 +75,19 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	})
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) // swagger 接口文档
 
+	// 功能路由group划分
 	adminLoginRouter := router.Group("/admin_login")
 	store, err := sessions.NewRedisStore(10, "tcp", "152.136.247.137:6380", "", []byte("secret"))
 	if err != nil {
 		log.Fatalf("sessions.NewRedisStore err:%v", err)
 	}
+	// 配置中间件
 	adminLoginRouter.Use(
 		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware())
+	// 注册子路由
 	{
 		controller.AdminLoginRegister(adminLoginRouter)
 	}
