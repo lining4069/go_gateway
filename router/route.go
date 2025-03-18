@@ -1,9 +1,15 @@
 package router
 
 import (
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/lining4069/go_common/lib"
+	"github.com/lining4069/go_gateway/controller"
 	"github.com/lining4069/go_gateway/docs"
+	"github.com/lining4069/go_gateway/middleware"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
 )
 
 // @title Swagger Example API
@@ -67,6 +73,20 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 			"message": "pong",
 		})
 	})
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler)) // swagger 接口文档
 
+	adminLoginRouter := router.Group("/admin_login")
+	store, err := sessions.NewRedisStore(10, "tcp", "152.136.247.137:6380", "", []byte("secret"))
+	if err != nil {
+		log.Fatalf("sessions.NewRedisStore err:%v", err)
+	}
+	adminLoginRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.TranslationMiddleware())
+	{
+		controller.AdminLoginRegister(adminLoginRouter)
+	}
 	return router
 }
